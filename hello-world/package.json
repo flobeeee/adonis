@@ -13,6 +13,7 @@
     "adonis-preset-ts": "^2.1.0",
     "eslint": "^7.29.0",
     "eslint-plugin-adonis": "^1.3.2",
+    "jest": "^27.0.6",
     "pino-pretty": "^5.1.0",
     "typescript": "^4.2.4",
     "youch": "^2.2.2",
