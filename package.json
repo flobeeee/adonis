@@ -1,0 +1,20 @@
+{
+  "name": "adonis",
+  "version": "1.0.0",
+  "description": "server using adonis unit test",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flobeeee/adonis.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/flobeeee/adonis/issues"
+  },
+  "homepage": "https://github.com/flobeeee/adonis#readme"
+}
