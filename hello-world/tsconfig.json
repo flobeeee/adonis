@@ -8,6 +8,7 @@
     "build"
   ],
   "compilerOptions": {
+    "target": "ES6",
     "outDir": "build",
     "rootDir": "./",
     "sourceMap": true,
@@ -27,7 +28,9 @@
     },
     "types": [
       "@adonisjs/core",
-      "@adonisjs/repl"
+      "@adonisjs/repl",
+      "jest",
+      "node"
     ]
   }
 }
