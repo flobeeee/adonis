@@ -19,20 +19,19 @@
 */
 
 import Route from '@ioc:Adonis/Core/Route'
-const userController = require('../controllers/user')
 
 // Route.get('/', async () => {
 //   return 'hello world'
 // })
 
 // 모든 유저 조회 (Read)
-Route.get('/', userController.read)
+Route.get('/', 'User.read')
 
 // 유저 추가 (Create)
-Route.post('/', userController.create)
+Route.post('/', 'User.create')
 
 // 유저 아이디 변경 (Update)
-Route.patch('/:index', userController.update)
+Route.patch('/:index', 'User.update')
 
 // 유저 삭제 (Delete)
-Route.delete('/:index', userController.delete)
+Route.delete('/:index', 'User.delete')
