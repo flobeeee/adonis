@@ -20,7 +20,7 @@ export default class UserController {
     const { user_id, name } = request.body()
 
     if (!user_id || !name) {
-      return response.status(400).send('message: required user_id and name')
+      return response.status(400).send({ 'message': 'required user_id and name' })
     }
 
     await user
@@ -28,7 +28,7 @@ export default class UserController {
       .save()
 
     if (user.$isPersisted) {
-      await response.send('message : created')
+      await response.send({ 'message': 'created' })
     }
   }
 
@@ -37,19 +37,19 @@ export default class UserController {
     const user = await User.findOrFail(params['index'])
 
     if (!name) {
-      return response.status(400).send('message: required  name')
+      return response.status(400).send({ 'message': 'required name' })
     }
 
     user.name = name
     await user.save()
 
-    response.send('message : updated')
+    response.send({ 'message': 'updated' })
   }
 
   public async delete({ params, response }: HttpContextContract) {
     const user = await User.findOrFail(params['index'])
     await user.delete()
 
-    response.send('message : deleted')
+    response.send({ 'message': 'deleted' })
   }
 }
