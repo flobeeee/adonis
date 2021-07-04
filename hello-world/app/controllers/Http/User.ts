@@ -1,19 +1,55 @@
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
+import User from 'App/Models/User'
 
-export default class User {
-  public async read({request, response}: HttpContextContract) {
-    response.send('모든 유저 리턴')
+export default class UserController {
+  public async read({ response }: HttpContextContract) {
+    const allUser = await User.all()
+    if (allUser.length === 0) {
+      return response.status(204)
+    }
+    response.send(allUser)
   }
-  public async create({request, response}: HttpContextContract) {
-    console.log(request.body())
-    response.send('유저 한명 생성')
+
+  public async readone({ params, response }: HttpContextContract) {
+    const userInfo = await User.findOrFail(params['index'])
+    response.send(userInfo)
   }
-  public async update({request, params, response}: HttpContextContract) {
-    console.log(params)
-    response.send('유저 닉네임 변경')
+
+  public async create({ request, response }: HttpContextContract) {
+    const user = new User()
+    const { user_id, name } = request.body()
+
+    if (!user_id || !name) {
+      return response.status(400).send('message: required user_id and name')
+    }
+
+    await user
+      .fill({ user_id: user_id, name: name })
+      .save()
+
+    if (user.$isPersisted) {
+      await response.send('message : created')
+    }
   }
-  public async delete({request, params, response}: HttpContextContract) {
-    console.log(params)
-    response.send('한 유저 삭제')
+
+  public async update({ request, params, response }: HttpContextContract) {
+    const { name } = request.body()
+    const user = await User.findOrFail(params['index'])
+
+    if (!name) {
+      return response.status(400).send('message: required  name')
+    }
+
+    user.name = name
+    await user.save()
+
+    response.send('message : updated')
+  }
+
+  public async delete({ params, response }: HttpContextContract) {
+    const user = await User.findOrFail(params['index'])
+    await user.delete()
+
+    response.send('message : deleted')
   }
 }

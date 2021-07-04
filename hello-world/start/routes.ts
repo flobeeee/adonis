@@ -27,6 +27,9 @@ import Route from '@ioc:Adonis/Core/Route'
 // 모든 유저 조회 (Read)
 Route.get('/', 'User.read')
 
+// 한 유저 조회 (Read)
+Route.get('/:index', 'User.readone')
+
 // 유저 추가 (Create)
 Route.post('/', 'User.create')
 
