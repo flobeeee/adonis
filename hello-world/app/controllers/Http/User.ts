@@ -28,7 +28,7 @@ export default class UserController {
       .save()
 
     if (user.$isPersisted) {
-      await response.send({ 'message': 'created' })
+      await response.status(201).send({ 'message': 'created' })
     }
   }
 
