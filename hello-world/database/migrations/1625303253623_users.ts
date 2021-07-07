@@ -8,16 +8,13 @@ export default class Users extends BaseSchema {
       table.increments('id').primary()
       table.string('user_id').unique().notNullable()
       table.string('name').notNullable()
-      table.timestamp('created_at')
-      // table.timestamp('updated_at')
-      // err : Invalid default value for 'updated_at'
-
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */
-      // table.timestamp('created_at', { useTz: true })
-      // table.timestamp('updated_at', { useTz: true })
+      table.timestamp('created_at', { useTz: true })
+      table.timestamp('updated_at', { useTz: true }).defaultTo(this.now())
+      // truncate 사용하면 index 초기화 가능
     })
   }
 
