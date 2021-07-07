@@ -26,17 +26,17 @@ import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
   // 모든 유저 조회 (Read)
-  Route.get('/', 'UserController.read')
+  Route.get('/get/:page', 'UserController.cgetAction')
   // 유저 추가 (Create)
-  Route.post('/', 'UserController.create')
+  Route.post('/', 'UserController.postAction')
 
   Route.group(() => {
     // 한 유저 조회 (Read)
-    Route.get('/:index', 'UserController.readone')
+    Route.get('/:index', 'UserController.getAction')
     // 유저 아이디 변경 (Update)
-    Route.patch('/:index', 'UserController.update')
+    Route.patch('/:index', 'UserController.patchNameAction')
     // 유저 삭제 (Delete)
-    Route.delete('/:index', 'UserController.delete')
+    Route.delete('/:index', 'UserController.deleteAction')
   })
     .where('index', /^[0-9]*$/) // /^[A-Za-z0-9]*$/
 }).prefix('/users')
