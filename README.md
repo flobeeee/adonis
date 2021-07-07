@@ -1,3 +1,3 @@
 # adonis
-- server using adonis
+- API server with adonis
 - unit test
