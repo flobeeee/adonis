@@ -13,7 +13,8 @@ export default class Users extends BaseSchema {
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */
       table.timestamp('created_at', { useTz: true })
-      table.timestamp('updated_at', { useTz: true })
+      table.timestamp('updated_at', { useTz: true }).defaultTo(this.now())
+      // truncate 사용하면 index 초기화 가능
     })
   }
 
