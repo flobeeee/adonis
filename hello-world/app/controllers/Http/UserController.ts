@@ -2,6 +2,7 @@ import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Database from "@ioc:Adonis/Lucid/Database"
 import User from 'App/Models/User'
+import Hash from '@ioc:Adonis/Core/Hash'
 
 export default class UserController {
   public async cgetAction({ params, response }: HttpContextContract) {
@@ -31,6 +32,7 @@ export default class UserController {
         rules.minLength(1),
         rules.maxLength(12),
       ]),
+      password: schema.string({})
     })
 
     try {
@@ -40,9 +42,10 @@ export default class UserController {
       // const name = request.input('name')
       const user_id = payload.user_id
       const name = payload.name
+      const password = payload.password
 
       await user
-        .fill({ user_id: user_id, name: name })
+        .fill({ user_id: user_id, name: name, password: password })
         .save()
 
       if (user.$isPersisted) {
@@ -62,10 +65,14 @@ export default class UserController {
     })
 
     try {
+      const user = await User.findOrFail(params['index'])
+      const checkPassword = await Hash.verify(user.password, request.input('password'))
+      if (!checkPassword) {
+        return response.unauthorized()
+      }
       await request.validate({ schema: patchSchema })
       const name = request.input('name')
-      const user = await User.findOrFail(params['index'])
-
+      
       user.name = name
       await user.save()
 
