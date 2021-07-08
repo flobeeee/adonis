@@ -1,5 +1,6 @@
-import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
-import Database from "@ioc:Adonis/Lucid/Database";
+import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
+import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import Database from "@ioc:Adonis/Lucid/Database"
 import User from 'App/Models/User'
 
 export default class UserController {
@@ -20,36 +21,59 @@ export default class UserController {
   }
 
   public async postAction({ request, response }: HttpContextContract) {
-    const user = new User()
-    const user_id = request.input('user_id')
-    const name = request.input('name')
+    const newPostSchema = schema.create({
+      user_id: schema.string({ trim: true }, [
+        rules.unique({ table: 'users', column: 'user_id' }),
+        rules.minLength(2),
+        rules.maxLength(12),
+      ]),
+      name: schema.string({ trim: true }, [
+        rules.minLength(1),
+        rules.maxLength(12),
+      ]),
+    })
 
-    if (!user_id || !name) {
-      return response.badRequest({ 'message': 'required user_id and name' })
-    }
+    try {
+      const payload = await request.validate({ schema: newPostSchema })
+      const user = new User()
+      // const user_id = request.input('user_id')
+      // const name = request.input('name')
+      const user_id = payload.user_id
+      const name = payload.name
 
-    await user
-      .fill({ user_id: user_id, name: name })
-      .save()
+      await user
+        .fill({ user_id: user_id, name: name })
+        .save()
 
-    if (user.$isPersisted) {
-      return response.created(user)
+      if (user.$isPersisted) {
+        return response.created(user)
+      }
+    } catch (error) {
+      response.badRequest(error.messages)
     }
   }
 
   public async patchNameAction({ request, params, response }: HttpContextContract) {
-    const name = request.input('name')
-    const user = await User.findOrFail(params['index'])
+    const patchSchema = schema.create({
+      name: schema.string({ trim: true }, [
+        rules.minLength(1),
+        rules.maxLength(12),
+      ]),
+    })
 
-    if (!name) {
-      return response.badRequest({ 'message': 'required name' })
-    }
+    try {
+      await request.validate({ schema: patchSchema })
+      const name = request.input('name')
+      const user = await User.findOrFail(params['index'])
 
-    user.name = name
-    await user.save()
+      user.name = name
+      await user.save()
 
-    if (user.$isPersisted) {
-      return response.ok(user)
+      if (user.$isPersisted) {
+        return response.ok(user)
+      }
+    } catch (error) {
+      response.badRequest(error.messages)
     }
   }
 

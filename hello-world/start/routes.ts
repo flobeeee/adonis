@@ -26,7 +26,7 @@ import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
   // 모든 유저 조회 (Read)
-  Route.get('/get/:page', 'UserController.cgetAction')
+  Route.get('/get/:page', 'UserController.cgetAction').where('page', /^[1-9]*$/)
   // 유저 추가 (Create)
   Route.post('/', 'UserController.postAction')
 
@@ -38,5 +38,5 @@ Route.group(() => {
     // 유저 삭제 (Delete)
     Route.delete('/:index', 'UserController.deleteAction')
   })
-    .where('index', /^[0-9]*$/) // /^[A-Za-z0-9]*$/
+    .where('index', /^[1-9]*$/) // /^[A-Za-z0-9]*$/
 }).prefix('/users')
