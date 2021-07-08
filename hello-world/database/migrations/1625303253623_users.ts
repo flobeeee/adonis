@@ -8,6 +8,7 @@ export default class Users extends BaseSchema {
       table.increments('id').primary()
       table.string('user_id').unique().notNullable()
       table.string('name').notNullable()
+      table.string('password').notNullable()
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
