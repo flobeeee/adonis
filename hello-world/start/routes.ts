@@ -23,8 +23,12 @@ import Route from '@ioc:Adonis/Core/Route'
 // Route.get('/', async () => {
 //   return 'hello world'
 // })
-Route.post('/login', 'LoginController.postLoginAction')
-Route.get('/mypage', 'LoginController.getMypageAction')
+
+Route.group(() => {
+  Route.post('/', 'AuthController.postLoginAction')
+  Route.get('/mypage', 'AuthController.getMypageAction')
+
+}).prefix('/login')
 
 Route.group(() => {
   // 모든 유저 조회 (Read)
