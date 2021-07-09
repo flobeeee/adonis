@@ -1,17 +1,17 @@
 import test from 'japa'
 import supertest from 'supertest'
 
-const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}`
+const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}/login`
 
-test.group('LoginController', () => {
+test.group('AuthController', () => {
   let auth
 
   test('postLoginAction', async (assert) => {
-    const { text } = await supertest(BASE_URL).post('/login').send({
+    const { text } = await supertest(BASE_URL).post('/').send({
       'user_id': 'user2', 'password': '2222'
     }).expect(200)
 
-    const { text: errAuth } = await supertest(BASE_URL).post('/login').send({
+    const { text: errAuth } = await supertest(BASE_URL).post('/').send({
       'user_id': 'user3', 'password': '2222'
     }).expect(400)
     assert.equal(errAuth, 'Invalid credentials')
@@ -24,17 +24,13 @@ test.group('LoginController', () => {
     const { text } = await supertest(BASE_URL)
       .get('/mypage')
       .auth(auth.token, { type: 'bearer' })
-      .send({
-        'user_id': 'user2', 'password': '2222'
-      }).expect(200)
+      .expect(200)
     const res = JSON.parse(text)
     assert.equal(res.name, '유저2')
 
     await supertest(BASE_URL)
       .get('/mypage')
       .auth(auth.token + 1, { type: 'bearer' })
-      .send({
-        'user_id': 'user2', 'password': '2222'
-      }).expect(401)
+      .expect(401)
   })
 })
