@@ -32,7 +32,9 @@ export default class UserController {
         rules.minLength(1),
         rules.maxLength(12),
       ]),
-      password: schema.string({})
+      password: schema.string({}, [
+        rules.minLength(4)
+      ])
     })
 
     try {
@@ -43,6 +45,10 @@ export default class UserController {
       const user_id = payload.user_id
       const name = payload.name
       const password = payload.password
+
+      if (!/^[a-z0-9]*$/.test(user_id)) {
+        return response.badRequest({'message' : 'special characters'})
+      }
 
       await user
         .fill({ user_id: user_id, name: name, password: password })
@@ -72,7 +78,7 @@ export default class UserController {
       }
       await request.validate({ schema: patchSchema })
       const name = request.input('name')
-      
+
       user.name = name
       await user.save()
 

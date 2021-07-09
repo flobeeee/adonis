@@ -3,7 +3,7 @@ import supertest from 'supertest'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}/users`
 
-test.group('controllers', () => {
+test.group('UserControllers', () => {
   test('cgetAction', async (assert) => {
     const { text } = await supertest(BASE_URL).get('/get/1').expect(200)
     const res = JSON.parse(text)
@@ -18,10 +18,10 @@ test.group('controllers', () => {
 
   test('postAction', async (assert) => {
     const { text } = await supertest(BASE_URL).post('/').send({
-      'user_id': 'postTest', 'name': '테스팅유저1', 'password': 'test'
+      'user_id': 'posttest', 'name': '테스팅유저1', 'password': 'test'
     }).expect(201)
     const res = JSON.parse(text)
-    assert.equal(res.user_id, 'postTest')
+    assert.equal(res.user_id, 'posttest')
     assert.equal(res.name, '테스팅유저1')
 
     const { text: errUnique } = await supertest(BASE_URL).post('/').send({
