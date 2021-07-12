@@ -46,12 +46,12 @@ export default class UserController {
       const name = payload.name
       const password = payload.password
 
-      if (!/^[a-z0-9]*$/.test(user_id)) {
-        return response.badRequest({'message' : 'special characters'})
+      if (!/^[A-Za-z0-9]*$/.test(user_id)) {
+        return response.badRequest({ 'message': 'special characters' })
       }
 
       await user
-        .fill({ user_id: user_id, name: name, password: password })
+        .fill({ userId: user_id, name: name, password: password })
         .save()
 
       if (user.$isPersisted) {

@@ -1,17 +1,13 @@
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
-import User from 'App/Models/User';
+import { UserFactory } from 'Database/factories'
 
 export default class UserSeeder extends BaseSeeder {
   public async run() {
-    // Write your database queries inside the run method
-    await User.createMany(cseed())
+    await UserFactory
+      .merge([
+        { userId: 'user1', name: '유저1', password: '1111' },
+        { userId: 'user2', name: '유저2', password: '2222' },
+      ])
+      .createMany(20)
   }
-}
-
-function cseed() {
-  let seeds: object[] = [];
-  for (let i = 1; i < 21; i++) {
-    seeds.push({ user_id: `user${i}`, name: `유저${i}`, password: `${i}${i}${i}${i}` })
-  }
-  return seeds;
 }

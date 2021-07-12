@@ -6,8 +6,8 @@ export default class User extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
-  @column()
-  public user_id: string
+  @column({ columnName: 'user_id',serializeAs: 'userId' })
+  public userId: string
 
   @column()
   public name: string
