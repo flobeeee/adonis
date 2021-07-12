@@ -1,20 +1,12 @@
 import User from "App/Models/User"
-import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import UserValidator from 'App/Validators/UserValidator'
 
 export default class AuthController {
+  // 로그인
   public async postLoginAction({ auth, request, response }) {
-    const loginSchema = schema.create({
-      user_id: schema.string({ trim: true }, [
-        rules.minLength(2),
-        rules.maxLength(12),
-      ]),
-      password: schema.string({}, [
-        rules.minLength(4)
-      ])
-    })
 
     try {
-      const payload = await request.validate({ schema: loginSchema })
+      const payload = await request.validate(UserValidator)
       const user_id = payload.user_id
       const password = payload.password
 
@@ -26,17 +18,45 @@ export default class AuthController {
         expiresIn: '1days'
       })
       return token
-    } catch {
+    } catch (error) {
       return response.badRequest('Invalid credentials')
+      // return response.send(error)
     }
   }
 
+  // 마이페이지
   public async getMypageAction({ auth, response }) {
     await auth.use('api').authenticate()
 
     if (auth.user!) {
       const user = await User.findOrFail(auth.user!['$attributes'].id)
       return response.ok(user)
+    } else {
+      return response.unauthorized()
+    }
+  }
+
+  // 회원정보 변경 (이름, 비밀번호)
+  public async putAction({ auth, request, params, response }) {
+    await auth.use('api').authenticate()
+
+    if (auth.user!) {
+      try {
+        const payload = await request.validate(UserValidator)
+        const user = await User.findOrFail(params['index'])
+        const name = payload.name
+        const password = payload.password
+
+        user.name = name
+        user.password = password
+
+        if (user.$isPersisted) {
+          return response.ok(user)
+        }
+      } catch (error) {
+        return response.badRequest(error.messages)
+      }
+
     } else {
       return response.unauthorized()
     }

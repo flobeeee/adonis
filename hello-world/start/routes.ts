@@ -27,6 +27,7 @@ import Route from '@ioc:Adonis/Core/Route'
 Route.group(() => {
   Route.post('/', 'AuthController.postLoginAction')
   Route.get('/mypage', 'AuthController.getMypageAction')
+  Route.put('/:index', 'AuthController.putAction')
 
 }).prefix('/login')
 

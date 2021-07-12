@@ -53,7 +53,7 @@ test.group('UserControllers', () => {
     assert.equal(ok.body.name, '변경된이름')
 
     await supertest(BASE_URL).patch('/1').expect(400)
-    await supertest(BASE_URL).patch('/1').send({ 'password': '1112' }).expect(401)
+    await supertest(BASE_URL).patch('/1').send({ 'password': '1112' }).expect(400)
     await supertest(BASE_URL).patch('/999').expect(400)
 
     const errRoute = await supertest(BASE_URL).patch('/hello').expect(404)

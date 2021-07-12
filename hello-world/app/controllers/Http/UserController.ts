@@ -2,9 +2,10 @@ import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Database from "@ioc:Adonis/Lucid/Database"
 import User from 'App/Models/User'
-import Hash from '@ioc:Adonis/Core/Hash'
+// import Hash from '@ioc:Adonis/Core/Hash'
 
 export default class UserController {
+  // 모든 유저 조회
   public async cgetAction({ params, response }: HttpContextContract) {
     const page = params['page'] || 1
     const limit = 10
@@ -16,11 +17,13 @@ export default class UserController {
     response.ok(users)
   }
 
+  // 한 유저 조회
   public async getAction({ params, response }: HttpContextContract) {
     const user = await User.findOrFail(params['index'])
     response.ok(user)
   }
 
+  // 유저 등록
   public async postAction({ request, response }: HttpContextContract) {
     const newPostSchema = schema.create({
       user_id: schema.string({ trim: true }, [
@@ -62,6 +65,7 @@ export default class UserController {
     }
   }
 
+  // 유저 이름 변경
   public async patchNameAction({ request, params, response }: HttpContextContract) {
     const patchSchema = schema.create({
       name: schema.string({ trim: true }, [
@@ -72,10 +76,10 @@ export default class UserController {
 
     try {
       const user = await User.findOrFail(params['index'])
-      const checkPassword = await Hash.verify(user.password, request.input('password'))
-      if (!checkPassword) {
-        return response.unauthorized()
-      }
+      // const checkPassword = await Hash.verify(user.password, request.input('password'))
+      // if (!checkPassword) {
+      //   return response.unauthorized()
+      // }
       await request.validate({ schema: patchSchema })
       const name = request.input('name')
 
@@ -90,6 +94,7 @@ export default class UserController {
     }
   }
 
+  // 유저 삭제
   public async deleteAction({ params, response }: HttpContextContract) {
     const user = await User.findOrFail(params['index'])
     await user.delete()
