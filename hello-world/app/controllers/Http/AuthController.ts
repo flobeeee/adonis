@@ -1,12 +1,12 @@
 import User from "App/Models/User"
-import UserValidator from 'App/Validators/UserValidator'
+import { PostValidator, PutValidator } from 'App/Validators/AuthValidator'
 
 export default class AuthController {
   // 로그인
   public async postLoginAction({ auth, request, response }) {
 
     try {
-      const payload = await request.validate(UserValidator)
+      const payload = await request.validate(PostValidator)
       const user_id = payload.user_id
       const password = payload.password
 
@@ -19,8 +19,7 @@ export default class AuthController {
       })
       return token
     } catch (error) {
-      return response.badRequest('Invalid credentials')
-      // return response.send(error)
+      response.badRequest('Invalid credentials')
     }
   }
 
@@ -38,17 +37,19 @@ export default class AuthController {
 
   // 회원정보 변경 (이름, 비밀번호)
   public async putAction({ auth, request, params, response }) {
+    // 유저 확인
     await auth.use('api').authenticate()
 
     if (auth.user!) {
       try {
-        const payload = await request.validate(UserValidator)
+        const payload = await request.validate(PutValidator)
         const user = await User.findOrFail(params['index'])
         const name = payload.name
         const password = payload.password
 
         user.name = name
         user.password = password
+        await user.save()
 
         if (user.$isPersisted) {
           return response.ok(user)

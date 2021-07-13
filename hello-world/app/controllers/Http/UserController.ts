@@ -1,7 +1,8 @@
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
-import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Database from "@ioc:Adonis/Lucid/Database"
 import User from 'App/Models/User'
+import { PostValidator, PatchValidator } from 'App/Validators/UserValidator'
+
 // import Hash from '@ioc:Adonis/Core/Hash'
 
 export default class UserController {
@@ -25,26 +26,10 @@ export default class UserController {
 
   // 유저 등록
   public async postAction({ request, response }: HttpContextContract) {
-    const newPostSchema = schema.create({
-      user_id: schema.string({ trim: true }, [
-        rules.unique({ table: 'users', column: 'user_id' }),
-        rules.minLength(2),
-        rules.maxLength(12),
-      ]),
-      name: schema.string({ trim: true }, [
-        rules.minLength(1),
-        rules.maxLength(12),
-      ]),
-      password: schema.string({}, [
-        rules.minLength(4)
-      ])
-    })
 
     try {
-      const payload = await request.validate({ schema: newPostSchema })
+      const payload = await request.validate(PostValidator)
       const user = new User()
-      // const user_id = request.input('user_id')
-      // const name = request.input('name')
       const user_id = payload.user_id
       const name = payload.name
       const password = payload.password
@@ -67,12 +52,6 @@ export default class UserController {
 
   // 유저 이름 변경
   public async patchNameAction({ request, params, response }: HttpContextContract) {
-    const patchSchema = schema.create({
-      name: schema.string({ trim: true }, [
-        rules.minLength(1),
-        rules.maxLength(12),
-      ]),
-    })
 
     try {
       const user = await User.findOrFail(params['index'])
@@ -80,7 +59,7 @@ export default class UserController {
       // if (!checkPassword) {
       //   return response.unauthorized()
       // }
-      await request.validate({ schema: patchSchema })
+      await request.validate(PatchValidator)
       const name = request.input('name')
 
       user.name = name

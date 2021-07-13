@@ -10,22 +10,17 @@ test.group('AuthController', () => {
     const ok = await supertest(BASE_URL).post('/').send({
       'user_id': 'user2', 'password': '2222'
     }).expect(200)
+    auth = ok.body // token 할당
 
     const errAuth = await supertest(BASE_URL).post('/').send({
       'user_id': 'user3', 'password': '2222'
     }).expect(400)
-    // console.log('test 17', errAuth.error)
-    assert.include(errAuth.text, 'Invalid credentials')
+    assert.equal(errAuth.text, 'Invalid credentials')
 
-    // todo 없는 유저 찾는 경우
-    // todo 유효성검사 메세지 확인 테스트
     const valid = await supertest(BASE_URL).post('/').send({
       'user_id': '1', 'password': '2222'
     }).expect(400)
-    assert.include(valid.text, 'Invalid credentials')
-    // assert.equal(valid.text, 'value has at least 2 length or more words')
-
-    auth = ok.body
+    assert.equal(valid.text, 'Invalid credentials')
   })
 
   test('getMypageAction', async (assert) => {
@@ -38,6 +33,31 @@ test.group('AuthController', () => {
     await supertest(BASE_URL)
       .get('/mypage')
       .auth(auth.token + 1, { type: 'bearer' })
+      .expect(401)
+  })
+
+  // todo putAction
+  test('putAction', async (assert) => {
+    const ok = await supertest(BASE_URL)
+      .put('/2')
+      .send({ 'name': '닉네임변경', 'password': 'change' })
+      .auth(auth.token, { type: 'bearer' })
+      .expect(200)
+    assert.equal(ok.body.name, '닉네임변경')
+    // 비밀번호 변경 후 로그인 테스트
+    await supertest(BASE_URL).post('/')
+      .send({ 'user_id': 'user2', 'password': 'change' }).expect(200)
+
+    const valid = await supertest(BASE_URL)
+      .put('/2')
+      .send({ 'name': '12345678901112', 'password': 'change' })
+      .auth(auth.token, { type: 'bearer' })
+      .expect(400)
+    assert.equal(valid.body.errors[0].message, 'name length limit exceeded')
+
+    await supertest(BASE_URL)
+      .put('/3')
+      .send({ 'name': '토큰없음', 'password': 'change' })
       .expect(401)
   })
 })

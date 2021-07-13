@@ -24,18 +24,18 @@ test.group('UserControllers', () => {
     const errUnique = await supertest(BASE_URL).post('/').send({
       'user_id': 'user2', 'name': '중복테스트', 'password': 'test'
     }).expect(400)
-    assert.equal(errUnique.body.errors[0].message, 'unique validation failure')
+    assert.equal(errUnique.body.errors[0].message, 'Username not available')
 
     const errValidMin = await supertest(BASE_URL).post('/').send({
       'user_id': 'a', 'password': 'test'
     }).expect(400)
-    assert.equal(errValidMin.body.errors[0].message, 'minLength validation failed')
-    assert.equal(errValidMin.body.errors[1].message, 'required validation failed')
+    assert.equal(errValidMin.body.errors[0].message, 'user_id has at least 2 length or more words')
+    assert.equal(errValidMin.body.errors[1].message, 'Missing value for name')
 
     const errValidMax = await supertest(BASE_URL).post('/').send({
       'user_id': '123456789101112', 'password': 'test'
     }).expect(400)
-    assert.equal(errValidMax.body.errors[0].message, 'maxLength validation failed')
+    assert.equal(errValidMax.body.errors[0].message, 'user_id length limit exceeded')
   })
 
   test('getAction', async (assert) => {
@@ -49,8 +49,11 @@ test.group('UserControllers', () => {
   })
 
   test('patchNameAction', async (assert) => {
-    const ok = await supertest(BASE_URL).patch('/1').send({ 'name': '변경된이름', 'password': '1111' }).expect(200)
+    const ok = await supertest(BASE_URL).patch('/1').send({ 'name': '변경된이름' }).expect(200)
     assert.equal(ok.body.name, '변경된이름')
+
+    const errValudRequired = await supertest(BASE_URL).patch('/2').expect(400)
+    assert.equal(errValudRequired.body.errors[0].message, 'Missing value for name')
 
     await supertest(BASE_URL).patch('/1').expect(400)
     await supertest(BASE_URL).patch('/1').send({ 'password': '1112' }).expect(400)
