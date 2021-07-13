@@ -4,7 +4,7 @@ import Factory from '@ioc:Adonis/Lucid/Factory'
 export const UserFactory = Factory
   .define(User, ({ faker }) => {
     return {
-      userId: faker.random.word(),
+      userId: faker.random.alpha({ count: 5 }),
       name: faker.internet.userName(),
       password: faker.internet.password(),
     }

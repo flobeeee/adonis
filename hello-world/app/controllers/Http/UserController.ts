@@ -1,53 +1,43 @@
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
-import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Database from "@ioc:Adonis/Lucid/Database"
 import User from 'App/Models/User'
-import Hash from '@ioc:Adonis/Core/Hash'
+import { PostValidator, PatchValidator } from 'App/Validators/UserValidator'
+import NoContent from 'App/Exceptions/NocontentException'
+import BadRequest from 'App/Exceptions/BadRequestException'
+
+// import Hash from '@ioc:Adonis/Core/Hash'
 
 export default class UserController {
+  // 모든 유저 조회
   public async cgetAction({ params, response }: HttpContextContract) {
     const page = params['page'] || 1
     const limit = 10
     const users = await Database.from('users').paginate(page, limit)
 
     if (users['rows'].length === 0) {
-      return response.noContent()
+      throw new NoContent('no record found', 204)
     }
     response.ok(users)
   }
 
+  // 한 유저 조회
   public async getAction({ params, response }: HttpContextContract) {
     const user = await User.findOrFail(params['index'])
     response.ok(user)
   }
 
+  // 유저 등록
   public async postAction({ request, response }: HttpContextContract) {
-    const newPostSchema = schema.create({
-      user_id: schema.string({ trim: true }, [
-        rules.unique({ table: 'users', column: 'user_id' }),
-        rules.minLength(2),
-        rules.maxLength(12),
-      ]),
-      name: schema.string({ trim: true }, [
-        rules.minLength(1),
-        rules.maxLength(12),
-      ]),
-      password: schema.string({}, [
-        rules.minLength(4)
-      ])
-    })
 
     try {
-      const payload = await request.validate({ schema: newPostSchema })
+      const payload = await request.validate(PostValidator)
       const user = new User()
-      // const user_id = request.input('user_id')
-      // const name = request.input('name')
       const user_id = payload.user_id
       const name = payload.name
       const password = payload.password
 
       if (!/^[A-Za-z0-9]*$/.test(user_id)) {
-        return response.badRequest({ 'message': 'special characters' })
+        throw new BadRequest('special characters', 400)
       }
 
       await user
@@ -58,25 +48,20 @@ export default class UserController {
         return response.created(user)
       }
     } catch (error) {
-      response.badRequest(error.messages)
+      throw new BadRequest(error.messages, 400)
     }
   }
 
+  // 유저 이름 변경
   public async patchNameAction({ request, params, response }: HttpContextContract) {
-    const patchSchema = schema.create({
-      name: schema.string({ trim: true }, [
-        rules.minLength(1),
-        rules.maxLength(12),
-      ]),
-    })
 
     try {
       const user = await User.findOrFail(params['index'])
-      const checkPassword = await Hash.verify(user.password, request.input('password'))
-      if (!checkPassword) {
-        return response.unauthorized()
-      }
-      await request.validate({ schema: patchSchema })
+      // const checkPassword = await Hash.verify(user.password, request.input('password'))
+      // if (!checkPassword) {
+      //   return response.unauthorized()
+      // }
+      await request.validate(PatchValidator)
       const name = request.input('name')
 
       user.name = name
@@ -86,16 +71,17 @@ export default class UserController {
         return response.ok(user)
       }
     } catch (error) {
-      response.badRequest(error.messages)
+      throw new BadRequest(error.messages, 400)
     }
   }
 
-  public async deleteAction({ params, response }: HttpContextContract) {
+  // 유저 삭제
+  public async deleteAction({ params }: HttpContextContract) {
     const user = await User.findOrFail(params['index'])
     await user.delete()
 
     if (user.$isDeleted) {
-      return response.noContent()
+      throw new NoContent('no record found', 204)
     }
   }
 }

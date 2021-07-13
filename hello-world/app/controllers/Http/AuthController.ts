@@ -1,36 +1,31 @@
 import User from "App/Models/User"
-import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import { PostValidator, PutValidator } from 'App/Validators/AuthValidator'
+import UnAuthorized from 'App/Exceptions/UnAuthorizedException'
+import BadRequest from 'App/Exceptions/BadRequestException'
 
 export default class AuthController {
-  public async postLoginAction({ auth, request, response }) {
-    const loginSchema = schema.create({
-      user_id: schema.string({ trim: true }, [
-        rules.minLength(2),
-        rules.maxLength(12),
-      ]),
-      password: schema.string({}, [
-        rules.minLength(4)
-      ])
-    })
+  // 로그인
+  public async postLoginAction({ auth, request }) {
 
     try {
-      const payload = await request.validate({ schema: loginSchema })
+      const payload = await request.validate(PostValidator)
       const user_id = payload.user_id
       const password = payload.password
 
       if (!/^[a-z0-9]*$/.test(user_id)) {
-        return response.badRequest({ 'message': 'special characters' })
+        throw new BadRequest('special characters', 400)
       }
 
       const token = await auth.use('api').attempt(user_id, password, {
         expiresIn: '1days'
       })
       return token
-    } catch {
-      return response.badRequest('Invalid credentials')
+    } catch (error) {
+      throw new UnAuthorized('invalid ID or wrong password', 401)
     }
   }
 
+  // 마이페이지
   public async getMypageAction({ auth, response }) {
     await auth.use('api').authenticate()
 
@@ -38,7 +33,40 @@ export default class AuthController {
       const user = await User.findOrFail(auth.user!['$attributes'].id)
       return response.ok(user)
     } else {
-      return response.unauthorized()
+      throw new UnAuthorized('you are not authorized', 401)
+    }
+  }
+
+  // 회원정보 변경 (이름, 비밀번호)
+  public async putAction({ auth, request, params, response }) {
+    // 유저 확인
+    await auth.use('api').authenticate()
+
+    if (Number(params['index']) !== auth.user!['$attributes'].id) {
+      throw new UnAuthorized('wrong token', 401)
+    }
+
+    if (auth.user!) {
+      try {
+
+        const payload = await request.validate(PutValidator)
+        const user = await User.findOrFail(params['index'])
+        const name = payload.name
+        const password = payload.password
+
+        user.name = name
+        user.password = password
+        await user.save()
+
+        if (user.$isPersisted) {
+          return response.ok(user)
+        }
+      } catch (error) {
+        throw new BadRequest(error.messages, 400)
+      }
+
+    } else {
+      throw new UnAuthorized('you are not authorized', 401)
     }
   }
 }
