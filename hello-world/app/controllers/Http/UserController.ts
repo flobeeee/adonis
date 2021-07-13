@@ -2,6 +2,8 @@ import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
 import Database from "@ioc:Adonis/Lucid/Database"
 import User from 'App/Models/User'
 import { PostValidator, PatchValidator } from 'App/Validators/UserValidator'
+import NoContent from 'App/Exceptions/NocontentException'
+import BadRequest from 'App/Exceptions/BadRequestException'
 
 // import Hash from '@ioc:Adonis/Core/Hash'
 
@@ -13,7 +15,7 @@ export default class UserController {
     const users = await Database.from('users').paginate(page, limit)
 
     if (users['rows'].length === 0) {
-      return response.noContent()
+      throw new NoContent('no record found', 204)
     }
     response.ok(users)
   }
@@ -35,7 +37,7 @@ export default class UserController {
       const password = payload.password
 
       if (!/^[A-Za-z0-9]*$/.test(user_id)) {
-        return response.badRequest({ 'message': 'special characters' })
+        throw new BadRequest('special characters', 400)
       }
 
       await user
@@ -46,7 +48,7 @@ export default class UserController {
         return response.created(user)
       }
     } catch (error) {
-      response.badRequest(error.messages)
+      throw new BadRequest(error.messages, 400)
     }
   }
 
@@ -69,17 +71,17 @@ export default class UserController {
         return response.ok(user)
       }
     } catch (error) {
-      response.badRequest(error.messages)
+      throw new BadRequest(error.messages, 400)
     }
   }
 
   // 유저 삭제
-  public async deleteAction({ params, response }: HttpContextContract) {
+  public async deleteAction({ params }: HttpContextContract) {
     const user = await User.findOrFail(params['index'])
     await user.delete()
 
     if (user.$isDeleted) {
-      return response.noContent()
+      throw new NoContent('no record found', 204)
     }
   }
 }

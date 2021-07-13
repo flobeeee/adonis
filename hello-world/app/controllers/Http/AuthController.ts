@@ -1,9 +1,11 @@
 import User from "App/Models/User"
 import { PostValidator, PutValidator } from 'App/Validators/AuthValidator'
+import UnAuthorized from 'App/Exceptions/UnAuthorizedException'
+import BadRequest from 'App/Exceptions/BadRequestException'
 
 export default class AuthController {
   // 로그인
-  public async postLoginAction({ auth, request, response }) {
+  public async postLoginAction({ auth, request }) {
 
     try {
       const payload = await request.validate(PostValidator)
@@ -11,7 +13,7 @@ export default class AuthController {
       const password = payload.password
 
       if (!/^[a-z0-9]*$/.test(user_id)) {
-        return response.badRequest({ 'message': 'special characters' })
+        throw new BadRequest('special characters', 400)
       }
 
       const token = await auth.use('api').attempt(user_id, password, {
@@ -19,7 +21,7 @@ export default class AuthController {
       })
       return token
     } catch (error) {
-      response.badRequest('Invalid credentials')
+      throw new UnAuthorized('invalid ID or wrong password', 401)
     }
   }
 
@@ -31,7 +33,7 @@ export default class AuthController {
       const user = await User.findOrFail(auth.user!['$attributes'].id)
       return response.ok(user)
     } else {
-      return response.unauthorized()
+      throw new UnAuthorized('you are not authorized', 401)
     }
   }
 
@@ -40,8 +42,13 @@ export default class AuthController {
     // 유저 확인
     await auth.use('api').authenticate()
 
+    if (Number(params['index']) !== auth.user!['$attributes'].id) {
+      throw new UnAuthorized('wrong token', 401)
+    }
+
     if (auth.user!) {
       try {
+
         const payload = await request.validate(PutValidator)
         const user = await User.findOrFail(params['index'])
         const name = payload.name
@@ -55,11 +62,11 @@ export default class AuthController {
           return response.ok(user)
         }
       } catch (error) {
-        return response.badRequest(error.messages)
+        throw new BadRequest(error.messages, 400)
       }
 
     } else {
-      return response.unauthorized()
+      throw new UnAuthorized('you are not authorized', 401)
     }
   }
 }

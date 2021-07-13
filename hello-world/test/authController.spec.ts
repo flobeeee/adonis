@@ -14,13 +14,13 @@ test.group('AuthController', () => {
 
     const errAuth = await supertest(BASE_URL).post('/').send({
       'user_id': 'user3', 'password': '2222'
-    }).expect(400)
-    assert.equal(errAuth.text, 'Invalid credentials')
+    }).expect(401)
+    assert.equal(errAuth.text, 'invalid ID or wrong password')
 
     const valid = await supertest(BASE_URL).post('/').send({
       'user_id': '1', 'password': '2222'
-    }).expect(400)
-    assert.equal(valid.text, 'Invalid credentials')
+    }).expect(401)
+    assert.equal(valid.text, 'invalid ID or wrong password')
   })
 
   test('getMypageAction', async (assert) => {
@@ -36,7 +36,6 @@ test.group('AuthController', () => {
       .expect(401)
   })
 
-  // todo putAction
   test('putAction', async (assert) => {
     const ok = await supertest(BASE_URL)
       .put('/2')
@@ -59,5 +58,12 @@ test.group('AuthController', () => {
       .put('/3')
       .send({ 'name': '토큰없음', 'password': 'change' })
       .expect(401)
+
+    const wrongToken = await supertest(BASE_URL)
+      .put('/3')
+      .send({ 'name': '닉네임변경', 'password': 'change' })
+      .auth(auth.token, { type: 'bearer' })
+      .expect(401)
+    assert.equal(wrongToken.text, 'wrong token')
   })
 })
