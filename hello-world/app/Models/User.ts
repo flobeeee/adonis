@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, beforeSave } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, beforeSave, hasOne, HasOne, afterCreate } from '@ioc:Adonis/Lucid/Orm'
+import Alarm from 'App/Models/Alarm'
 import Hash from '@ioc:Adonis/Core/Hash'
 
 export default class User extends BaseModel {
@@ -27,4 +28,7 @@ export default class User extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  @hasOne(() => Alarm)
+  public profile: HasOne<typeof Alarm>
 }

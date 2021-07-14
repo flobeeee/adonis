@@ -1,3 +1,4 @@
+import Alarm from 'App/Models/Alarm'
 import test from 'japa'
 import supertest from 'supertest'
 
@@ -20,6 +21,9 @@ test.group('UserControllers', () => {
     }).expect(201)
     assert.equal(created.body.userId, 'posttest')
     assert.equal(created.body.email, 'posttest@gmail.com')
+    // alarm 레코드 생성 확인
+    const alarm = await Alarm.findBy('user_id', created.body.id)
+    assert.equal(alarm?.$attributes.user_id, created.body.id)
 
     const errUnique = await supertest(BASE_URL).post('/').send({
       'user_id': 'user2', 'email': 'unique@gmail.com', 'password': 'test', 'passwordConfirmation': 'test'

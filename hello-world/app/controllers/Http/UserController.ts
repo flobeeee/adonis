@@ -4,6 +4,7 @@ import User from 'App/Models/User'
 import { PostValidator, PatchValidator } from 'App/Validators/UserValidator'
 import NoContent from 'App/Exceptions/NocontentException'
 import BadRequest from 'App/Exceptions/BadRequestException'
+import Alarm from "App/Models/Alarm"
 
 export default class UserController {
   // 모든 유저 조회
@@ -43,6 +44,10 @@ export default class UserController {
         .save()
 
       if (user.$isPersisted) {
+        const alarm = new Alarm()
+        await alarm
+          .fill({ user_id: user.id, isSend: false })
+          .save()
         return response.created(user)
       }
     } catch (error) {
