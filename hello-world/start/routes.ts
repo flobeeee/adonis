@@ -25,10 +25,16 @@ import Route from '@ioc:Adonis/Core/Route'
 // })
 
 Route.group(() => {
+  // 로그인
   Route.post('/', 'AuthController.postLoginAction')
-  Route.get('/mypage', 'AuthController.getMypageAction')
-  Route.put('/:index', 'AuthController.putAction')
 
+  Route.group(() => {
+    // 마이페이지
+    Route.get('/mypage', 'AuthController.getMypageAction')
+    // 회원정보 변경 (닉네임, 비밀번호)
+    Route.put('/:index', 'AuthController.putAction').where('index', /^[1-9]*$/)
+  })
+    .middleware('auth')
 }).prefix('/login')
 
 Route.group(() => {

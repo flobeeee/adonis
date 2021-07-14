@@ -26,13 +26,14 @@ test.group('AuthController', () => {
   test('getMypageAction', async (assert) => {
     const ok = await supertest(BASE_URL)
       .get('/mypage')
-      .auth(auth.token, { type: 'bearer' })
+      // .auth(auth.token, { type: 'bearer' })
+      .set('Authorization', 'Bearer ' + auth.token)
       .expect(200)
     assert.equal(ok.body.name, '유저2')
 
     await supertest(BASE_URL)
       .get('/mypage')
-      .auth(auth.token + 1, { type: 'bearer' })
+      .set('Authorization', 'Bearer ' + auth.token + 1)
       .expect(401)
   })
 
@@ -40,7 +41,7 @@ test.group('AuthController', () => {
     const ok = await supertest(BASE_URL)
       .put('/2')
       .send({ 'name': '닉네임변경', 'password': 'change' })
-      .auth(auth.token, { type: 'bearer' })
+      .set('Authorization', 'Bearer ' + auth.token)
       .expect(200)
     assert.equal(ok.body.name, '닉네임변경')
     // 비밀번호 변경 후 로그인 테스트
@@ -50,19 +51,20 @@ test.group('AuthController', () => {
     const valid = await supertest(BASE_URL)
       .put('/2')
       .send({ 'name': '12345678901112', 'password': 'change' })
-      .auth(auth.token, { type: 'bearer' })
+      .set('Authorization', 'Bearer ' + auth.token)
       .expect(400)
     assert.equal(valid.body.errors[0].message, 'name length limit exceeded')
 
     await supertest(BASE_URL)
       .put('/3')
       .send({ 'name': '토큰없음', 'password': 'change' })
+      .set('Authorization', 'Bearer ')
       .expect(401)
 
     const wrongToken = await supertest(BASE_URL)
       .put('/3')
       .send({ 'name': '닉네임변경', 'password': 'change' })
-      .auth(auth.token, { type: 'bearer' })
+      .set('Authorization', 'Bearer ' + auth.token)
       .expect(401)
     assert.equal(wrongToken.text, 'wrong token')
   })
