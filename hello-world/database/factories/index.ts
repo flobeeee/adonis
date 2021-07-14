@@ -5,7 +5,7 @@ export const UserFactory = Factory
   .define(User, ({ faker }) => {
     return {
       userId: faker.random.alpha({ count: 5 }),
-      name: faker.internet.userName(),
+      email: faker.internet.email(),
       password: faker.internet.password(),
     }
   })

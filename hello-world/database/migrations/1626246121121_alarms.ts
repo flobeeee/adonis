@@ -1,21 +1,19 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
-export default class Users extends BaseSchema {
-  protected tableName = 'users'
+export default class Alarms extends BaseSchema {
+  protected tableName = 'alarms'
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id').primary()
-      table.string('user_id').unique().notNullable()
-      table.string('email').notNullable()
-      table.string('password').notNullable()
+      table.increments('id')
+      table.boolean('is_send').notNullable()
+      table.integer('user_id').unsigned().references('id').inTable('users').onDelete('CASCADE')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now())
-      // truncate 사용하면 index 초기화 가능
     })
   }
 

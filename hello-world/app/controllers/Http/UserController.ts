@@ -4,8 +4,7 @@ import User from 'App/Models/User'
 import { PostValidator, PatchValidator } from 'App/Validators/UserValidator'
 import NoContent from 'App/Exceptions/NocontentException'
 import BadRequest from 'App/Exceptions/BadRequestException'
-
-// import Hash from '@ioc:Adonis/Core/Hash'
+import Alarm from "App/Models/Alarm"
 
 export default class UserController {
   // 모든 유저 조회
@@ -33,7 +32,7 @@ export default class UserController {
       const payload = await request.validate(PostValidator)
       const user = new User()
       const user_id = payload.user_id
-      const name = payload.name
+      const email = payload.email
       const password = payload.password
 
       if (!/^[A-Za-z0-9]*$/.test(user_id)) {
@@ -41,10 +40,14 @@ export default class UserController {
       }
 
       await user
-        .fill({ userId: user_id, name: name, password: password })
+        .fill({ userId: user_id, email: email, password: password })
         .save()
 
       if (user.$isPersisted) {
+        const alarm = new Alarm()
+        await alarm
+          .fill({ user_id: user.id, isSend: false })
+          .save()
         return response.created(user)
       }
     } catch (error) {
@@ -52,19 +55,16 @@ export default class UserController {
     }
   }
 
-  // 유저 이름 변경
-  public async patchNameAction({ request, params, response }: HttpContextContract) {
+  // 유저 이메일 변경
+  public async patchEmailAction({ request, params, response }: HttpContextContract) {
 
     try {
       const user = await User.findOrFail(params['index'])
-      // const checkPassword = await Hash.verify(user.password, request.input('password'))
-      // if (!checkPassword) {
-      //   return response.unauthorized()
-      // }
-      await request.validate(PatchValidator)
-      const name = request.input('name')
 
-      user.name = name
+      await request.validate(PatchValidator)
+      const email = request.input('email')
+
+      user.email = email
       await user.save()
 
       if (user.$isPersisted) {

@@ -25,10 +25,16 @@ import Route from '@ioc:Adonis/Core/Route'
 // })
 
 Route.group(() => {
+  // 로그인
   Route.post('/', 'AuthController.postLoginAction')
-  Route.get('/mypage', 'AuthController.getMypageAction')
-  Route.put('/:index', 'AuthController.putAction')
 
+  Route.group(() => {
+    // 마이페이지
+    Route.get('/mypage', 'AuthController.getMypageAction')
+    // 회원정보 변경 (닉네임, 비밀번호)
+    Route.put('/:index', 'AuthController.putAction').where('index', /^[1-9]*$/)
+  })
+    .middleware('auth')
 }).prefix('/login')
 
 Route.group(() => {
@@ -41,7 +47,7 @@ Route.group(() => {
     // 한 유저 조회 (Read)
     Route.get('/:index', 'UserController.getAction')
     // 유저 아이디 변경 (Update)
-    Route.patch('/:index', 'UserController.patchNameAction')
+    Route.patch('/:index', 'UserController.patchEmailAction')
     // 유저 삭제 (Delete)
     Route.delete('/:index', 'UserController.deleteAction')
   })
