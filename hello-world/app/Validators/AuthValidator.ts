@@ -35,9 +35,8 @@ export class PutValidator {
     //   rules.minLength(2),
     //   rules.maxLength(12),
     // ]),
-    name: schema.string({ trim: true }, [
-      rules.minLength(1),
-      rules.maxLength(12),
+    email: schema.string({ trim: true }, [
+      rules.email()
     ]),
     password: schema.string({}, [
       rules.minLength(4)

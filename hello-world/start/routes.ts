@@ -47,7 +47,7 @@ Route.group(() => {
     // 한 유저 조회 (Read)
     Route.get('/:index', 'UserController.getAction')
     // 유저 아이디 변경 (Update)
-    Route.patch('/:index', 'UserController.patchNameAction')
+    Route.patch('/:index', 'UserController.patchEmailAction')
     // 유저 삭제 (Delete)
     Route.delete('/:index', 'UserController.deleteAction')
   })

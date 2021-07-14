@@ -51,10 +51,10 @@ export default class AuthController {
 
         const payload = await request.validate(PutValidator)
         const user = await User.findOrFail(params['index'])
-        const name = payload.name
+        const email = payload.email
         const password = payload.password
 
-        user.name = name
+        user.email = email
         user.password = password
         await user.save()
 

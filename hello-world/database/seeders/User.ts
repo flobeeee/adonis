@@ -5,9 +5,9 @@ export default class UserSeeder extends BaseSeeder {
   public async run() {
     await UserFactory
       .merge([
-        { userId: 'user1', name: '유저1', password: '1111' },
-        { userId: 'user2', name: '유저2', password: '2222' },
-        { userId: 'user3', name: '유저3', password: '3333' },
+        { userId: 'user1', email: 'test1@gmail.com', password: '1111' },
+        { userId: 'user2', email: 'test2@gmail.com', password: '2222' },
+        { userId: 'user3', email: 'test3@gmail.com', password: '3333' },
 
       ])
       .createMany(20)
