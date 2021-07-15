@@ -1,10 +1,18 @@
 import Alarm from 'App/Models/Alarm'
 import test from 'japa'
 import supertest from 'supertest'
+import Event from '@ioc:Adonis/Core/Event'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}/users`
 
-test.group('UserControllers', () => {
+test.group('UserControllers', (group) => {
+
+  group.afterEach(async () => {
+    // Restores the trap
+    Event.restore()
+  })
+
+
   test('cgetAction', async (assert) => {
     const ok = await supertest(BASE_URL).get('/get/1').expect(200)
     assert.equal(ok.body.data.length, 10)
@@ -24,6 +32,7 @@ test.group('UserControllers', () => {
     // alarm 레코드 생성 확인
     const alarm = await Alarm.findBy('user_id', created.body.id)
     assert.equal(alarm?.$attributes.user_id, created.body.id)
+    assert.equal(alarm?.isSend, true)
 
     const errUnique = await supertest(BASE_URL).post('/').send({
       'user_id': 'user2', 'email': 'unique@gmail.com', 'password': 'test', 'passwordConfirmation': 'test'
@@ -43,6 +52,10 @@ test.group('UserControllers', () => {
     assert.equal(errValid.body.errors[1].message, 'Missing value for email')
     assert.equal(errValid.body.errors[2].message, 'confirmed validation failed')
 
+    // 이벤트
+    Event.trap('new:user', (user) => {
+      assert.property(user, 'email')
+    })
   })
 
   test('getAction', async (assert) => {
