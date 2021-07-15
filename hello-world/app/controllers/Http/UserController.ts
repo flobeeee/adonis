@@ -5,8 +5,11 @@ import { PostValidator, PatchValidator } from 'App/Validators/UserValidator'
 import NoContent from 'App/Exceptions/NocontentException'
 import BadRequest from 'App/Exceptions/BadRequestException'
 import Alarm from "App/Models/Alarm"
+import Event from '@ioc:Adonis/Core/Event'
+import WelcomeEmail from "App/Mailers/WelcomeEmail"
 
 export default class UserController {
+
   // 모든 유저 조회
   public async cgetAction({ params, response }: HttpContextContract) {
     const page = params['page'] || 1
@@ -48,6 +51,12 @@ export default class UserController {
         await alarm
           .fill({ user_id: user.id, isSend: false })
           .save()
+
+        // 이벤트
+        await Event.emit('new:user', { email: user.email, userId: user.userId })
+        alarm.isSend = true
+        await alarm.save()
+
         return response.created(user)
       }
     } catch (error) {
