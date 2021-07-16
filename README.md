@@ -4,4 +4,4 @@
 
 - step1 : CURD API
 - step2 : token login
-- step3 : ing.. 
+- step3 : validation, events, file uploads
