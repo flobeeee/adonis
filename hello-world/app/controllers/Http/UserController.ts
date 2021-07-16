@@ -115,6 +115,20 @@ export default class UserController {
       response.badRequest('required image')
     }
   }
+
+  // 직접 파일 업로드
+  // public async postImageAction({ request }: HttpContextContract) {
+  //   request.multipart.onFile('input_field_name', {}, (part) => {
+  //     someSdk.uploadStream(part)
+  //   })
+
+  //   await request.multipart.process()
+
+  //   const file = request.input('input_field_name')
+  //   if (file.hasErrors) {
+  //     return file.errors
+  //   }
+  // }
 }
 
   // cgetAction - 목록 => /users
