@@ -1,7 +1,7 @@
-import Alarm from 'App/Models/Alarm'
 import test from 'japa'
 import supertest from 'supertest'
 import Event from '@ioc:Adonis/Core/Event'
+import Alarm from 'App/Models/Alarm'
 
 const BASE_URL = `http://${process.env.HOST}:${process.env.PORT}/users`
 

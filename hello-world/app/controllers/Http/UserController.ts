@@ -1,13 +1,13 @@
-import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
+import Application from '@ioc:Adonis/Core/Application'
 import Database from "@ioc:Adonis/Lucid/Database"
+import Event from '@ioc:Adonis/Core/Event'
+import { cuid } from '@ioc:Adonis/Core/Helpers'
+import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
 import User from 'App/Models/User'
+import Alarm from "App/Models/Alarm"
 import { PostValidator, PatchValidator } from 'App/Validators/UserValidator'
 import NoContent from 'App/Exceptions/NocontentException'
 import BadRequest from 'App/Exceptions/BadRequestException'
-import Alarm from "App/Models/Alarm"
-import Event from '@ioc:Adonis/Core/Event'
-import Application from '@ioc:Adonis/Core/Application'
-import { cuid } from '@ioc:Adonis/Core/Helpers'
 
 
 
