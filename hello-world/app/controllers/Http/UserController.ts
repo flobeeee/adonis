@@ -6,7 +6,10 @@ import NoContent from 'App/Exceptions/NocontentException'
 import BadRequest from 'App/Exceptions/BadRequestException'
 import Alarm from "App/Models/Alarm"
 import Event from '@ioc:Adonis/Core/Event'
-import WelcomeEmail from "App/Mailers/WelcomeEmail"
+import Application from '@ioc:Adonis/Core/Application'
+import { cuid } from '@ioc:Adonis/Core/Helpers'
+
+
 
 export default class UserController {
 
@@ -93,6 +96,39 @@ export default class UserController {
       throw new NoContent('no record found', 204)
     }
   }
+
+  // 사진업로드
+  public async postImageAction({ request, params, response }: HttpContextContract) {
+    const user = await User.findOrFail(params['index'])
+    const image = request.file('image')
+    // console.log('가공전 image', image)
+    if (image) {
+      const fileName = `${cuid()}.${image.extname}`
+      await image.move(Application.tmpPath('uploads'), {
+        name: fileName
+      })
+      // console.log('가공후 image', image)
+      user.image = `${image?.fileName}`
+      await user.save()
+      response.send(image)
+    } else {
+      response.badRequest('required image')
+    }
+  }
+
+  // 직접 파일 업로드
+  // public async postImageAction({ request }: HttpContextContract) {
+  //   request.multipart.onFile('input_field_name', {}, (part) => {
+  //     someSdk.uploadStream(part)
+  //   })
+
+  //   await request.multipart.process()
+
+  //   const file = request.input('input_field_name')
+  //   if (file.hasErrors) {
+  //     return file.errors
+  //   }
+  // }
 }
 
   // cgetAction - 목록 => /users

@@ -114,7 +114,7 @@ const bodyParserConfig: BodyParserConfig = {
     |
     */
     autoProcess: true,
-
+    // autoProcess: false, // direct file uploads
     /*
     |--------------------------------------------------------------------------
     | Files to be processed manually
