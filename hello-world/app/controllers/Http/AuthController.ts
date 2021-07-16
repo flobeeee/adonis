@@ -27,7 +27,7 @@ export default class AuthController {
 
   // 마이페이지
   public async getMypageAction({ auth, response }) {
-    // await auth.use('api').authenticate()
+    // await auth.use('api').authenticate() // middleware 로 처리
 
     if (auth.user!) {
       const user = await User.findOrFail(auth.user!['$attributes'].id)

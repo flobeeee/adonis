@@ -30,11 +30,6 @@ export class PutValidator {
   }
 
   public schema = schema.create({
-    // user_id: schema.string({ trim: true }, [
-    //   rules.unique({ table: 'users', column: 'user_id' }),
-    //   rules.minLength(2),
-    //   rules.maxLength(12),
-    // ]),
     email: schema.string({ trim: true }, [
       rules.email()
     ]),
