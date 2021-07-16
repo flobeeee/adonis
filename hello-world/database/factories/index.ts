@@ -7,6 +7,7 @@ export const UserFactory = Factory
       userId: faker.random.alpha({ count: 5 }),
       email: faker.internet.email(),
       password: faker.internet.password(),
+      image: faker.random.image()
     }
   })
   .build()

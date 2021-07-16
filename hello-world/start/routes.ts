@@ -19,10 +19,19 @@
 */
 
 import Route from '@ioc:Adonis/Core/Route'
+import Application from '@ioc:Adonis/Core/Application'
 
-// Route.get('/', async () => {
-//   return 'hello world'
-// })
+
+Route.get('/', async () => {
+  return 'hello world'
+})
+
+// 사진 저장
+Route.get('uploads/:filename', async ({ params, response }) => {
+  return response.attachment(
+    Application.tmpPath('uploads', params.filename)
+  )
+})
 
 Route.group(() => {
   // 로그인
@@ -50,6 +59,8 @@ Route.group(() => {
     Route.patch('/:index', 'UserController.patchEmailAction')
     // 유저 삭제 (Delete)
     Route.delete('/:index', 'UserController.deleteAction')
+    // 사진업로드
+    Route.post(':index', 'UserController.postImageAction')
   })
     .where('index', /^[1-9]*$/) // /^[A-Za-z0-9]*$/
 }).prefix('/users')

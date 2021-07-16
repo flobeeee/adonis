@@ -16,6 +16,9 @@ export default class User extends BaseModel {
   @column({ serializeAs: null })
   public password: string
 
+  @column()
+  public image: string
+
   @beforeSave()
   public static async hashPassword(user: User) {
     if (user.$dirty.password) {
@@ -30,5 +33,5 @@ export default class User extends BaseModel {
   public updatedAt: DateTime
 
   @hasOne(() => Alarm)
-  public profile: HasOne<typeof Alarm>
+  public alarm: HasOne<typeof Alarm>
 }
